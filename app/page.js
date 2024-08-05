@@ -116,7 +116,7 @@ export default function Home() {
               }}
               />
               <IconButton title="Add" aria-label="add" color="success" onClick={() => {
-                addItem(itemName)
+                addItem(itemName.toLowerCase())
                 setItemName("")
                 handleClose()
               }}>
