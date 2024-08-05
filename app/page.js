@@ -6,12 +6,15 @@ import { Box, Typography, Modal, style, Stack, TextField, Button, IconButton } f
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
+import InfoIcon from '@mui/icons-material/Info';
+import CloseIcon from '@mui/icons-material/Close';
 import { collection, deleteDoc, doc, getDoc, getDocs, query, setDoc } from "firebase/firestore";
 
 export default function Home() {
   const [inventory, setInventory] = useState([])
   const [open, setOpen] = useState(false)
   const [openSearch, setOpenSearch] = useState(false)
+  const [openInfo, setOpenInfo] = useState(false)
   const [itemName, setItemName] = useState("")
   const [search, setSearch] = useState("")
 
@@ -66,6 +69,9 @@ export default function Home() {
   const searchOpen = () => setOpenSearch(true)
   const searchClose = () => setOpenSearch(false)
 
+  const infoOpen = () => setOpenInfo(true)
+  const infoClose = () => setOpenInfo(false)
+
   return (
     <Box
       width="100vw"
@@ -74,20 +80,31 @@ export default function Home() {
       flexDirection="column"
       justifyContent="center"
       alignItems="center"
-      gap={2}
+      gap={0}
     >
-      <Stack width = "800px" height = "300px" spacing={20} overflow="auto">
+      <IconButton
+        color="inherit"
+        aria-label="info"
+        style={{ position: 'absolute', top: 16, right: 16 }}
+        title="Info"
+        onClick={() => {
+          infoOpen()
+        }}
+      >
+        <InfoIcon />
+      </IconButton>
+      <Stack width = "800px" height = "100px" overflow="auto">
         <Box
           width="800px"
           height="100px"
-          bgcolor="#ADD8E6"
+          bgcolor="#c0f599"
           direction = "row"
-          spacing={20}
+          spacing={1}
           display={"flex"}
-          alignItems="center"
-          justifyContent="center">
+          justifyContent="space-between"
+          alignItems="center">
           <Modal open={open} onClose={handleClose}>
-            <Box position="absolute" top="50%" left="50%" width={400} bgcolor="white" border="2px solid #000" boxShadow={24} p={4} display="flex" flexDirection="column" gap={3} sx={{transform: 'translate(-50%,-50%)'}}>
+            <Box position="absolute" top="50%" left="50%" width={400} bgcolor="white" border="2px solid #000" boxShadow={24} p={4} display="flex" flexDirection="column" gap={4} sx={{transform: 'translate(-50%,-50%)'}}>
             <Typography variant="h6">Add Item</Typography>
             <Stack width="100%" direction="row" spacing={2}>
               <TextField 
@@ -98,15 +115,13 @@ export default function Home() {
                 setItemName(e.target.value)
               }}
               />
-              <Button
-              variant="contained"
-              color="success"
-              onClick={() => {
+              <IconButton title="Add" aria-label="add" color="success" onClick={() => {
                 addItem(itemName)
                 setItemName("")
                 handleClose()
-              }}
-              >Add</Button>
+              }}>
+                <AddIcon />
+              </IconButton>
             </Stack>
           </Box>
         </Modal>
@@ -131,7 +146,16 @@ export default function Home() {
             </Stack>
           </Box>
         </Modal>
-        <IconButton color="success" aria-label="add" size="large" fontSize="large" onClick={() => {
+        <Modal open={openInfo} onclose={infoClose}>
+          <Box position="absolute" top="50%" left="50%" width={400} bgcolor="white" border="2px solid #000" boxShadow={24} p={4} display="flex" flexDirection="column" gap={3} sx={{transform: 'translate(-50%,-50%)'}}>
+            <Typography variant="h6">How To Use:</Typography>
+            <Typography variant="p">Click on the plus icon to add an item to the pantry.</Typography>
+            <Typography variant="p">Click on the search icon to search for pantry items that contain the given text.</Typography>
+            <Typography variant="p">Click on the trash icon to remove one of a specific item.</Typography>
+            <IconButton color="error" aria-label="close" onClick={infoClose} style={{ position: 'absolute', top: 8, right: 8 }}><CloseIcon/></IconButton>
+          </Box>
+        </Modal>
+        <IconButton title="Add Pantry Item" variant="contained" color="inherit" aria-label="add" size="large" fontSize="large" onClick={() => {
           handleOpen()
         }}>
           <AddIcon />
@@ -139,7 +163,7 @@ export default function Home() {
         <Typography variant = "h2" color = "#333">
           Pantry Tracker
         </Typography>
-        <IconButton color="success" aria-label="search" onClick={() => {
+        <IconButton title="Search Pantry Items" color="inherit" aria-label="search" onClick={() => {
           searchOpen()
         }}>
           <SearchIcon />
@@ -147,12 +171,13 @@ export default function Home() {
         </Box>
       </Stack>
       <Box border='1px solid #333'>
-        <Stack width = "800px" height = "300px" spacing={2} overflow="auto">
+        <Stack width = "800px" height = "500px" spacing={2} overflow="auto">
           {inventory.map(({name, quantity})=> (
               <Box 
               key={name} 
               width="100%"
-              minHeight={"150px"}
+              minHeight={"50px"}
+              maxHeight={"50px"}
               display="flex"
               alignItems="center"
               justifyContent="space-between"
@@ -160,7 +185,7 @@ export default function Home() {
               padding={5}>
                 <Typography variant="h3" color = "#333" textAlign={"center"}>{name.charAt(0).toUpperCase() + name.slice(1)}</Typography>
                 <Typography variant="h3" color = "#333" textAlign={"center"}>{quantity}</Typography>
-                <IconButton color="error" aria-label="delete" style={{ fontSize: 60 }} height="60" width="60">
+                <IconButton title="Remove" color="error" aria-label="delete" style={{ fontSize: 60 }} height="60" width="60" onClick={() => {removeItem(name)}}>
                   <DeleteIcon  />
                 </IconButton>
               </Box>
